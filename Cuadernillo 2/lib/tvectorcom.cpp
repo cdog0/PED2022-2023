@@ -55,12 +55,12 @@ TVectorCom& TVectorCom::operator=(TVectorCom& v) {
 }
 
 // Sobrecarga del operador de igualdad
-bool TVectorCom::operator==(TVectorCom& v) {
+bool TVectorCom::operator==(const TVectorCom &v) const {
     if (tamano != v.tamano)
         return false;
 
     for (int i = 1; i <= tamano; i++) {
-        if (c[i-1] != v.c[i-1])
+        if (c[i] != v.c[i])
             return false;
     }
 

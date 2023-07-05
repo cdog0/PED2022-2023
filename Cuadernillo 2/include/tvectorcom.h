@@ -22,7 +22,7 @@ public:
 
     // Sobrecarga de operadores
     TVectorCom& operator=(TVectorCom&);
-    bool operator==(TVectorCom&);
+    bool operator==(const TVectorCom&) const;
     bool operator!=(TVectorCom&);
     TComplejo& operator[](int);
     TComplejo operator[](int) const;

@@ -1,35 +1,33 @@
-#ifndef TABBCOM_H
-#define TABBCOM_H
+#ifndef TABB_H
+#define TABB_H
 
-#include <iostream>
 #include "tcomplejo.h"
-#include "tnodoabb.h"
 #include "tvectorcom.h"
+#include <queue>
+#include <iostream>
 
-using namespace std;
+class TNodoABB;
 
-class TABBCom {
+class TABBCom{
 private:
-    TNodoABB* nodo;
+    TNodoABB *nodo;
 
-    void InordenAux(TVectorCom& v, int& posicion) const;
-    void PreordenAux(TVectorCom& v, int& posicion) const;
-    void PostordenAux(TVectorCom& v, int& posicion) const;
-    void NivelesAux(TVectorCom& v, int& posicion) const;
+    void InordenAux(TVectorCom &v, int &posicion) const;
+    void PreordenAux(TVectorCom &v, int &posicion) const;
+    void PostordenAux(TVectorCom &v, int &posicion) const;
 
 public:
     TABBCom();
-    TABBCom(const TABBCom& abb);
+    TABBCom(const TABBCom &abb);
     ~TABBCom();
-    TABBCom& operator=(const TABBCom& abb);
+    TABBCom &operator=(const TABBCom &abb);
 
-    bool operator==(const TABBCom& abb) const;
+    bool operator==(const TABBCom &abb) const;
 
     bool EsVacio() const;
-    bool Insertar(const TComplejo& complejo);
-    bool Borrar(const TComplejo& complejo);
-    bool Buscar(const TComplejo& complejo) const;
-
+    bool Insertar(TComplejo &com);
+    bool Borrar(TComplejo &com);
+    bool Buscar(TComplejo &com) const;
     TComplejo Raiz() const;
     int Altura() const;
     int Nodos() const;
@@ -39,8 +37,23 @@ public:
     TVectorCom Preorden() const;
     TVectorCom Postorden() const;
     TVectorCom Niveles() const;
+    void NivelesAux(TVectorCom &v, int &posicion) const;
 
-    friend ostream& operator<<(ostream& os, const TABBCom& abb);
+    friend ostream &operator<<(ostream &os, const TABBCom &abb);
 };
 
-#endif  // TABBCOM_H
+class TNodoABB {
+friend class TABBCom;
+
+private:
+    TComplejo item;
+    TABBCom iz, de;
+
+public:
+    TNodoABB();
+    TNodoABB(const TNodoABB &nodo);
+    ~TNodoABB();
+    TNodoABB &operator=(const TNodoABB &nodo);
+};
+
+#endif

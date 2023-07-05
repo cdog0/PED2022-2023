@@ -1,12 +1,31 @@
 #include "tabbcom.h"
 
+/* Implementación de la clase TNodoABB */
+
+TNodoABB::TNodoABB() {}
+
+TNodoABB::TNodoABB(const TNodoABB &nodo) : item(nodo.item), iz(nodo.iz), de(nodo.de) {}
+
+TNodoABB::~TNodoABB() {}
+
+TNodoABB &TNodoABB::operator=(const TNodoABB &nodo) {
+    if (this != &nodo) {
+        item = nodo.item;
+        iz = nodo.iz;
+        de = nodo.de;
+    }
+    return *this;
+}
+
+/* Implementación de la clase TABBCom */
+
 TABBCom::TABBCom() : nodo(nullptr) {}
 
-TABBCom::TABBCom(const TABBCom& abb) {
+TABBCom::TABBCom(const TABBCom &abb) {
+    nodo = nullptr;  // Inicializamos el nodo como nullptr
+
     if (abb.nodo != nullptr) {
-        nodo = new TNodoABB(*abb.nodo);
-    } else {
-        nodo = nullptr;
+        nodo = new TNodoABB(*abb.nodo);  // Copiamos el nodo si no es nullptr
     }
 }
 
@@ -15,7 +34,7 @@ TABBCom::~TABBCom() {
     nodo = nullptr;
 }
 
-TABBCom& TABBCom::operator=(const TABBCom& abb) {
+TABBCom &TABBCom::operator=(const TABBCom &abb) {
     if (this != &abb) {
         delete nodo;
         if (abb.nodo != nullptr) {
@@ -27,76 +46,103 @@ TABBCom& TABBCom::operator=(const TABBCom& abb) {
     return *this;
 }
 
-bool TABBCom::operator==(const TABBCom& abb) const {
-    return (nodo == nullptr && abb.nodo == nullptr) ||
-           (nodo != nullptr && abb.nodo != nullptr && *nodo == *abb.nodo);
+bool TABBCom::operator==(const TABBCom &abb) const {
+    if (EsVacio() && abb.EsVacio()) {
+        return true;
+    } else if (!EsVacio() && !abb.EsVacio()) {
+        TVectorCom v1 = Inorden();
+        TVectorCom v2 = abb.Inorden();
+        return v1 == v2;
+    } else {
+        return false;
+    }
 }
 
 bool TABBCom::EsVacio() const {
     return nodo == nullptr;
 }
 
-bool TABBCom::Insertar(const TComplejo& complejo) {
+bool TABBCom::Insertar(TComplejo &com) {
     if (EsVacio()) {
         nodo = new TNodoABB();
-        nodo->item = complejo;
+        nodo->item = com;
         return true;
-    } else if (complejo == nodo->item) {
-        return false;
-    } else if (complejo < nodo->item) {
-        return nodo->iz->Insertar(complejo);
     } else {
-        return nodo->de->Insertar(complejo);
+        if (com == nodo->item) {
+            return false;  // No se permiten elementos repetidos
+        } else if (com.Mod() < nodo->item.Mod() || (com.Mod() == nodo->item.Mod() && com.Re() < nodo->item.Re()) ||
+                   (com.Mod() == nodo->item.Mod() && com.Re() == nodo->item.Re() && com.Im() < nodo->item.Im())) {
+            return nodo->iz.Insertar(com);
+        } else {
+            return nodo->de.Insertar(com);
+        }
     }
 }
 
-bool TABBCom::Borrar(const TComplejo& complejo) {
+bool TABBCom::Borrar(TComplejo &com) {
     if (EsVacio()) {
         return false;
-    } else if (complejo == nodo->item) {
-        if (nodo->iz == nullptr && nodo->de == nullptr) {
+    } else if (com == nodo->item) {
+        if (nodo->iz.EsVacio() && nodo->de.EsVacio()) {
             delete nodo;
             nodo = nullptr;
-        } else if (nodo->iz == nullptr) {
-            TNodoABB* aux = nodo;
-            nodo = nodo->de;
-            aux->de = nullptr;
+        } else if (nodo->iz.EsVacio()) {
+            TNodoABB *aux = nodo;
+            nodo = nodo->de.nodo;
+            aux->de.nodo = nullptr;
             delete aux;
-        } else if (nodo->de == nullptr) {
-            TNodoABB* aux = nodo;
-            nodo = nodo->iz;
-            aux->iz = nullptr;
+        } else if (nodo->de.EsVacio()) {
+            TNodoABB *aux = nodo;
+            nodo = nodo->iz.nodo;
+            aux->iz.nodo = nullptr;
             delete aux;
         } else {
-            TComplejo sucesor = nodo->de->Raiz();
-            nodo->item = sucesor;
-            return nodo->de->Borrar(sucesor);
+           TNodoABB *aux = nodo->iz.nodo;
+            if (aux->de.EsVacio()) {
+                nodo->item = aux->item;
+                nodo->iz.nodo = aux->iz.nodo;
+                aux->iz.nodo = nullptr;
+                delete aux;
+            } else {
+                while (!aux->de.nodo->de.EsVacio()) {
+                    aux = aux->de.nodo;
+                }
+                TNodoABB *aux2 = aux->de.nodo;
+                nodo->item = aux2->item;
+                aux->de.nodo = aux2->iz.nodo;
+                aux2->iz.nodo = nullptr;
+                delete aux2;
+            }
         }
         return true;
-    } else if (complejo < nodo->item) {
-        return nodo->iz->Borrar(complejo);
+    } else if (com.Mod() < nodo->item.Mod() ||
+               (com.Mod() == nodo->item.Mod() && com.Re() < nodo->item.Re()) ||
+               (com.Mod() == nodo->item.Mod() && com.Re() == nodo->item.Re() && com.Im() < nodo->item.Im())) {
+        return nodo->iz.Borrar(com);
     } else {
-        return nodo->de->Borrar(complejo);
+        return nodo->de.Borrar(com);
     }
 }
 
-bool TABBCom::Buscar(const TComplejo& complejo) const {
+bool TABBCom::Buscar(TComplejo &com) const {
     if (EsVacio()) {
         return false;
-    } else if (complejo == nodo->item) {
+    } else if (com == nodo->item) {
         return true;
-    } else if (complejo < nodo->item) {
-        return nodo->iz->Buscar(complejo);
+    } else if (com.Mod() < nodo->item.Mod() ||
+               (com.Mod() == nodo->item.Mod() && com.Re() < nodo->item.Re()) ||
+               (com.Mod() == nodo->item.Mod() && com.Re() == nodo->item.Re() && com.Im() < nodo->item.Im())) {
+        return nodo->iz.Buscar(com);
     } else {
-        return nodo->de->Buscar(complejo);
+        return nodo->de.Buscar(com);
     }
 }
 
 TComplejo TABBCom::Raiz() const {
-    if (EsVacio()) {
-        return TComplejo();
-    } else {
+    if (!EsVacio()) {
         return nodo->item;
+    } else {
+        return TComplejo();
     }
 }
 
@@ -104,100 +150,117 @@ int TABBCom::Altura() const {
     if (EsVacio()) {
         return 0;
     } else {
-        return 1 + max(nodo->iz->Altura(), nodo->de->Altura());
+        return 1 + max(nodo->iz.Altura(), nodo->de.Altura());
     }
 }
 
 int TABBCom::Nodos() const {
-   if (EsVacio()) {
+    if (EsVacio()) {
         return 0;
     } else {
-        return 1 + nodo->iz->Nodos() + nodo->de->Nodos();
+        return 1 + nodo->iz.Nodos() + nodo->de.Nodos();
     }
 }
 
 int TABBCom::NodosHoja() const {
     if (EsVacio()) {
         return 0;
-    } else if (nodo->iz->EsVacio() && nodo->de->EsVacio()) {
+    } else if (nodo->iz.EsVacio() && nodo->de.EsVacio()) {
         return 1;
     } else {
-        return nodo->iz->NodosHoja() + nodo->de->NodosHoja();
+        return nodo->iz.NodosHoja() + nodo->de.NodosHoja();
+    }
+}
+
+void TABBCom::InordenAux(TVectorCom &v, int &posicion) const {
+    if (!EsVacio()) {
+        nodo->iz.InordenAux(v, posicion);
+        v[posicion] = nodo->item;
+        posicion++;
+        nodo->de.InordenAux(v, posicion);
     }
 }
 
 TVectorCom TABBCom::Inorden() const {
-    TVectorCom v(Nodos());
     int posicion = 1;
-    InordenAux(v, posicion);
+    TVectorCom v(Nodos());
+    if (nodo != nullptr) {  // Verificamos que el nodo no sea nullptr antes de llamar a InordenAux
+        InordenAux(v, posicion);
+    }
     return v;
 }
 
+void TABBCom::PreordenAux(TVectorCom &v, int &posicion) const {
+    if (!EsVacio()) {
+        v[posicion] = nodo->item;
+        posicion++;
+        nodo->iz.PreordenAux(v, posicion);
+        nodo->de.PreordenAux(v, posicion);
+    }
+}
+
 TVectorCom TABBCom::Preorden() const {
-    TVectorCom v(Nodos());
     int posicion = 1;
+    TVectorCom v(Nodos());
     PreordenAux(v, posicion);
     return v;
 }
 
+void TABBCom::PostordenAux(TVectorCom &v, int &posicion) const {
+    if (!EsVacio()) {
+        nodo->iz.PostordenAux(v, posicion);
+        nodo->de.PostordenAux(v, posicion);
+        v[posicion] = nodo->item;
+        posicion++;
+    }
+}
+
 TVectorCom TABBCom::Postorden() const {
-    TVectorCom v(Nodos());
     int posicion = 1;
+    TVectorCom v(Nodos());
     PostordenAux(v, posicion);
     return v;
 }
 
-TVectorCom TABBCom::Niveles() const {
-    TVectorCom v(Nodos());
-    int posicion = 1;
-    NivelesAux(v, posicion);
-    return v;
-}
-
-void TABBCom::InordenAux(TVectorCom& v, int& posicion) const {
+void TABBCom::NivelesAux(TVectorCom &v, int &posicion) const {
+    queue<const TNodoABB *> cola;
     if (!EsVacio()) {
-        nodo->iz->InordenAux(v, posicion);
-        v[posicion++] = nodo->item;
-        nodo->de->InordenAux(v, posicion);
-    }
-}
-
-void TABBCom::PreordenAux(TVectorCom& v, int& posicion) const {
-    if (!EsVacio()) {
-        v[posicion++] = nodo->item;
-        nodo->iz->PreordenAux(v, posicion);
-        nodo->de->PreordenAux(v, posicion);
-    }
-}
-
-void TABBCom::PostordenAux(TVectorCom& v, int& posicion) const {
-    if (!EsVacio()) {
-        nodo->iz->PostordenAux(v, posicion);
-        nodo->de->PostordenAux(v, posicion);
-        v[posicion++] = nodo->item;
-    }
-}
-
-void TABBCom::NivelesAux(TVectorCom& v, int& posicion) const {
-    if (!EsVacio()) {
-        TVectorCom cola(Nodos());
-        int frente = 1;
-        int fin = 1;
-        cola[fin] = nodo;
-        while (frente <= fin) {
-            TNodoABB* actual = cola[frente++];
-            v[posicion++] = actual->item;
-            if (actual->iz != nullptr) {
-                cola[++fin] = actual->iz;
+        cola.push(nodo);
+        while (!cola.empty()) {
+            const TNodoABB *n = cola.front();
+            cola.pop();
+            v[posicion] = n->item;
+            posicion++;
+            if (!n->iz.EsVacio()) {
+                cola.push(n->iz.nodo);
             }
-            if (actual->de != nullptr) {
-                cola[++fin] = actual->de;
+            if (!n->de.EsVacio()) {
+                cola.push(n->de.nodo);
             }
         }
     }
 }
 
-ostream& operator<<(ostream& os, const TABBCom& abb) {
-    os << abb.Inorden();
+TVectorCom TABBCom::Niveles() const {
+    int posicion = 1;
+    TVectorCom v(Nodos());
+    NivelesAux(v, posicion);
+    return v;
+}
+
+std::ostream& operator<<(std::ostream& os, const TABBCom& abb) {
+    TVectorCom v = abb.Niveles();
+
+    os << "[";
+    for (int i = 1; i <= v.Tamano(); i++) {
+        os << "(" << i << ") " << v[i];
+
+        if (i < v.Tamano())
+            os << ", ";
+    }
+    os << "]";
+
     return os;
 }
+
+

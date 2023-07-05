@@ -55,12 +55,14 @@ TVectorCom& TVectorCom::operator=(TVectorCom& v) {
 }
 
 // Sobrecarga del operador de igualdad
-bool TVectorCom::operator==(const TVectorCom &v) const {
-    if (tamano != v.tamano)
+bool TVectorCom::operator==(const TVectorCom &v) const{
+    
+    if (this->tamano != v.tamano)
         return false;
 
-    for (int i = 1; i <= tamano; i++) {
+    for (int i = 0; i <= tamano; i++) {
         if (c[i] != v.c[i])
+            cout<< c[i] << ' ' << v.c[i]<<endl;
             return false;
     }
 
@@ -162,7 +164,7 @@ bool TVectorCom::Redimensionar(int size) {
 }
 
 // Sobrecarga del operador de salida
-ostream& operator<<(ostream& output, TVectorCom& v) {
+ostream& operator<<(ostream& output, const TVectorCom& v) {
     output << "[";
 
     for (int i = 1; i <= v.tamano; i++) {

@@ -35,7 +35,7 @@ public:
     bool Redimensionar(int);
 
     // Funciones amigas
-    friend ostream& operator<<(ostream&, TVectorCom&);
+    friend ostream& operator<<(ostream&, const TVectorCom&);
 };
 
 #endif

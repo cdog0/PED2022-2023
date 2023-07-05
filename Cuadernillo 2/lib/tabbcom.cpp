@@ -34,25 +34,27 @@ TABBCom::~TABBCom() {
     nodo = nullptr;
 }
 
-TABBCom &TABBCom::operator=(const TABBCom &abb) {
+TABBCom& TABBCom::operator=(const TABBCom &abb) {
     if (this != &abb) {
-        delete nodo;
-        if (abb.nodo != nullptr) {
+        if (nodo != nullptr)
+            delete nodo;
+
+        if (abb.nodo != nullptr)
             nodo = new TNodoABB(*abb.nodo);
-        } else {
+        else
             nodo = nullptr;
-        }
     }
     return *this;
 }
 
 bool TABBCom::operator==(const TABBCom &abb) const {
+
     if (EsVacio() && abb.EsVacio()) {
         return true;
     } else if (!EsVacio() && !abb.EsVacio()) {
         TVectorCom v1 = Inorden();
         TVectorCom v2 = abb.Inorden();
-        return v1 == v2;
+        return (v1 == v2);
     } else {
         return false;
     }
@@ -262,5 +264,6 @@ std::ostream& operator<<(std::ostream& os, const TABBCom& abb) {
 
     return os;
 }
+
 
 

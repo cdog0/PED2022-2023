@@ -114,6 +114,7 @@ TListaCom::TListaCom(const TListaCom& other) {
     }
 }
 
+
 TListaCom::~TListaCom() {
     TListaPos p = Primera();
     while (!p.EsVacia()) {
@@ -178,14 +179,15 @@ TListaCom TListaCom::operator+(const TListaCom& other) {
 }
 
 TListaCom TListaCom::operator-(const TListaCom& other) {
-    TListaCom lista;
+    TListaCom lista = *this;
 
-    TListaPos p = Primera();
+    TListaPos p = lista.Primera();
     while (!p.EsVacia()) {
-        if (!other.Buscar(Obtener(p))) {
-            lista.InsertarD(Obtener(p), lista.Ultima());
+        if (other.Buscar(lista.Obtener(p))) {
+            lista.Borrar(p);
+        } else {
+            p = p.Siguiente();
         }
-        p = p.Siguiente();
     }
 
     return lista;
@@ -377,9 +379,18 @@ TListaPos TListaCom::Ultima() const {
 
 ostream& operator<<(ostream& os, TListaCom& l) {
     TListaPos p = l.Primera();
-    while (!p.EsVacia()) {
-        os << l.Obtener(p) << " ";
-        p = p.Siguiente();
+    TListaPos aux;
+    os << "{";
+    while (!p.EsVacia()) {   
+        aux = p.Siguiente();
+        if(!aux.EsVacia()){ 
+            os << l.Obtener(p) << " ";
+            p = p.Siguiente();
+        }else{
+            os << l.Obtener(p);
+            p = p.Siguiente();
+        }
     }
+    os << "}";
     return os;
 }

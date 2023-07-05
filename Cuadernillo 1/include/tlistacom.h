@@ -2,6 +2,8 @@
 #define TLISTACOM_H
 
 #include "tcomplejo.h"
+#include "tlistacom.h"
+#include "tvectorcom.h"
 
 class TListaNodo;
 
@@ -23,6 +25,8 @@ public:
     TListaPos Anterior() const;
     TListaPos Siguiente() const;
     bool EsVacia() const;
+
+    friend ostream& operator<<(ostream& os, const TListaPos& p);
 };
 
 class TListaNodo {
@@ -53,23 +57,23 @@ private:
 
 public:
     TListaCom();
-    TListaCom(const TListaCom&);
+    TListaCom(const TListaCom& l);
     ~TListaCom();
-    TListaCom& operator=(const TListaCom&);
+    TListaCom& operator=(const TListaCom& l);
 
-    bool operator==(const TListaCom&);
-    bool operator!=(const TListaCom&);
-    TListaCom operator+(const TListaCom&);
-    TListaCom operator-(const TListaCom&);
+    bool operator==(const TListaCom& l);
+    bool operator!=(const TListaCom& l) ;
+    TListaCom operator+(const TListaCom& l);
+    TListaCom operator-(const TListaCom& l);
     bool EsVacia() const;
-    bool InsCabeza(const TComplejo&);
-    bool InsertarI(const TComplejo&, const TListaPos&);
-    bool InsertarD(const TComplejo&, const TListaPos&);
-    bool Borrar(const TComplejo&);
-    bool BorrarTodos(const TComplejo&);
-    bool Borrar(const TListaPos&);
-    TComplejo Obtener(const TListaPos&) const;
-    bool Buscar(const TComplejo&) const;
+    bool InsCabeza(const TComplejo& l);
+    bool InsertarI(const TComplejo& c, const TListaPos& l);
+    bool InsertarD(const TComplejo& c, const TListaPos& l);
+    bool Borrar(const TComplejo& c);
+    bool BorrarTodos(const TComplejo& c);
+    bool Borrar(const TListaPos& l);
+    TComplejo Obtener(const TListaPos& l) const;
+    bool Buscar(const TComplejo& c) const;
     int Longitud() const;
     TListaPos Primera() const;
     TListaPos Ultima() const;

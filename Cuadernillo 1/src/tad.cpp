@@ -1,25 +1,27 @@
 /* Prueba:
-     "-", Primera, Ultima
+      - Función Longitud() de una TListaCom
+      - Función Buscar(TComplejo) en una TListaCom
 */
+
 #include <iostream>
+#include "tlistacom.h"
 
 using namespace std;
-
-#include "tlistacom.h"
 
 int
 main(void)
 {
-  TComplejo a, b(1), c(2, 3), d(3,4);
-  TListaCom l1,l2,l3;
+  TComplejo a(-3, -3), b;
+  TListaCom l1;
   
-  l1.InsCabeza(a);
-  l1.InsertarD(b, l1.Ultima());
-  l2.InsCabeza(c);
-  l2.InsertarI(b, l2.Primera());
-  
-  l3=l1-l2;
-  cout<<"l3 = "<<l3<<endl;
-   
+  for (int i=0; i<10; i++) {
+         a = a + double(i);
+         l1.InsCabeza(a);
+  }
+  cout<<l1.Longitud()<<endl;
+  if (l1.Buscar(a)) cout<<"Encontrado c"<<endl;
+  else cout<<"No encontrado c"<<endl;
+  if (l1.Buscar(b)) cout<<"Encontrado b"<<endl;
+  else cout<<"No encontrado c"<<endl;
   return 0;
 }
